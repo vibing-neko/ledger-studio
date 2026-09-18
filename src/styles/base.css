@@ -1,0 +1,367 @@
+/* ── 色彩：預設深色，淺色在下方覆寫 ──
+   跟隨系統時不帶 data-theme，手動指定時 data-theme="light" / "dark" */
+:root {
+	--bg: #0c0d0b;
+	--line: rgba(236, 229, 212, 0.08);
+	--line-strong: rgba(236, 229, 212, 0.16);
+	--ink: #ece5d4;
+	--ink-2: #a8a293;
+	--ink-3: #6d695f;
+	--brass: #d6a54a;
+	--brass-light: #f2cf86;
+	--on-brass: #1a1408;
+	--vermilion: #e27a5f;
+	--sky: #86a8e7;
+	--rise: #ef5b54;
+	--fall: #3fb37f;
+
+	/* 信用卡標記色：避開漲跌的紅綠 */
+	--card-1: #d6a54a;
+	--card-2: #86a8e7;
+	--card-3: #e2875f;
+	--card-4: #4fb0bd;
+	--card-5: #a58ce3;
+	--card-6: #dc84a8;
+	--card-7: #8e98ab;
+	--card-8: #c8b184;
+
+	/* 圖表分類色：驗證過色盲辨識，順序即相鄰安全的排列，不要重排 */
+	--cat-1: #3987e5;
+	--cat-2: #d95926;
+	--cat-3: #199e70;
+	--cat-4: #c98500;
+	--cat-5: #d55181;
+	--cat-6: #008300;
+	--cat-7: #9085e9;
+	--cat-8: #e66767;
+
+	--page-bg:
+		radial-gradient(1100px 620px at 88% -8%, rgba(214, 165, 74, 0.11), transparent 62%),
+		radial-gradient(900px 520px at -12% 36%, rgba(134, 168, 231, 0.05), transparent 60%),
+		var(--bg);
+	--grain: 0.05;
+	--header-bg: rgba(12, 13, 11, 0.72);
+	--panel-bg: linear-gradient(165deg, rgba(236, 229, 212, 0.045), rgba(236, 229, 212, 0.01) 60%);
+	--card-bg: rgba(27, 27, 23, 0.86);
+	--card-sheen: rgba(255, 255, 255, 0.04);
+	--sunken-bg: rgba(8, 8, 6, 0.42);
+	--shadow-card:
+		inset 0 1px 0 rgba(255, 255, 255, 0.05),
+		1px 2px 4px rgba(0, 0, 0, 0.3),
+		10px 22px 44px -18px rgba(0, 0, 0, 0.85);
+	--shadow-lift:
+		inset 0 1px 0 rgba(255, 255, 255, 0.06),
+		2px 4px 8px rgba(0, 0, 0, 0.3),
+		18px 40px 70px -20px rgba(0, 0, 0, 0.9);
+	--shadow-panel: 0 50px 120px -50px rgba(0, 0, 0, 0.9), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+
+	--font-sans: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif;
+	--font-serif: "Noto Serif TC", "Songti TC", "PMingLiU", serif;
+	--font-display: "Fraunces", Georgia, var(--font-serif);
+	--font-mono: "JetBrains Mono", ui-monospace, Consolas, monospace;
+
+	--gutter: clamp(1rem, 4vw, 3rem);
+	--max: 1240px;
+	--ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+
+	color-scheme: dark;
+}
+
+/* 淺色：紙張感，深墨文字 */
+@media (prefers-color-scheme: light) {
+	:root:not([data-theme="dark"]) {
+		--bg: #f2eee4;
+		--line: rgba(38, 33, 25, 0.1);
+		--line-strong: rgba(38, 33, 25, 0.18);
+		--ink: #221f19;
+		--ink-2: #57524a;
+		--ink-3: #8b8479;
+		--brass: #9a6a1b;
+		--brass-light: #7c5312;
+		--on-brass: #fdf8ec;
+		--vermilion: #b8532c;
+		--sky: #3f68b8;
+		--rise: #d3312c;
+		--fall: #1c8f5a;
+
+		--card-1: #9a6a1b;
+		--card-2: #3f68b8;
+		--card-3: #b85a2e;
+		--card-4: #1d7f8c;
+		--card-5: #6a52b6;
+		--card-6: #ad4a78;
+		--card-7: #5b6577;
+		--card-8: #8a7449;
+
+		--cat-1: #2a78d6;
+		--cat-2: #eb6834;
+		--cat-3: #1baf7a;
+		--cat-4: #eda100;
+		--cat-5: #e87ba4;
+		--cat-6: #008300;
+		--cat-7: #4a3aa7;
+		--cat-8: #e34948;
+
+		--page-bg:
+			radial-gradient(1100px 620px at 88% -8%, rgba(214, 165, 74, 0.2), transparent 62%),
+			radial-gradient(900px 520px at -12% 36%, rgba(120, 152, 214, 0.12), transparent 60%),
+			var(--bg);
+		--grain: 0.035;
+		--header-bg: rgba(242, 238, 228, 0.78);
+		--panel-bg: linear-gradient(165deg, rgba(255, 255, 255, 0.86), rgba(255, 255, 255, 0.52) 60%);
+		--card-bg: rgba(255, 255, 255, 0.88);
+		--card-sheen: rgba(255, 255, 255, 0.9);
+		--sunken-bg: rgba(255, 255, 255, 0.72);
+		--shadow-card:
+			inset 0 1px 0 rgba(255, 255, 255, 0.8),
+			1px 2px 4px rgba(72, 58, 34, 0.08),
+			10px 22px 40px -20px rgba(72, 58, 34, 0.28);
+		--shadow-lift:
+			inset 0 1px 0 rgba(255, 255, 255, 0.9),
+			2px 4px 8px rgba(72, 58, 34, 0.1),
+			18px 40px 64px -22px rgba(72, 58, 34, 0.32);
+		--shadow-panel: 0 40px 90px -50px rgba(72, 58, 34, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.7);
+
+		color-scheme: light;
+	}
+}
+
+:root[data-theme="light"] {
+	--bg: #f2eee4;
+	--line: rgba(38, 33, 25, 0.1);
+	--line-strong: rgba(38, 33, 25, 0.18);
+	--ink: #221f19;
+	--ink-2: #57524a;
+	--ink-3: #8b8479;
+	--brass: #9a6a1b;
+	--brass-light: #7c5312;
+	--on-brass: #fdf8ec;
+	--vermilion: #b8532c;
+	--sky: #3f68b8;
+	--rise: #d3312c;
+	--fall: #1c8f5a;
+
+	--card-1: #9a6a1b;
+	--card-2: #3f68b8;
+	--card-3: #b85a2e;
+	--card-4: #1d7f8c;
+	--card-5: #6a52b6;
+	--card-6: #ad4a78;
+	--card-7: #5b6577;
+	--card-8: #8a7449;
+
+	--cat-1: #2a78d6;
+	--cat-2: #eb6834;
+	--cat-3: #1baf7a;
+	--cat-4: #eda100;
+	--cat-5: #e87ba4;
+	--cat-6: #008300;
+	--cat-7: #4a3aa7;
+	--cat-8: #e34948;
+
+	--page-bg:
+		radial-gradient(1100px 620px at 88% -8%, rgba(214, 165, 74, 0.2), transparent 62%),
+		radial-gradient(900px 520px at -12% 36%, rgba(120, 152, 214, 0.12), transparent 60%),
+		var(--bg);
+	--grain: 0.035;
+	--header-bg: rgba(242, 238, 228, 0.78);
+	--panel-bg: linear-gradient(165deg, rgba(255, 255, 255, 0.86), rgba(255, 255, 255, 0.52) 60%);
+	--card-bg: rgba(255, 255, 255, 0.88);
+	--card-sheen: rgba(255, 255, 255, 0.9);
+	--sunken-bg: rgba(255, 255, 255, 0.72);
+	--shadow-card:
+		inset 0 1px 0 rgba(255, 255, 255, 0.8),
+		1px 2px 4px rgba(72, 58, 34, 0.08),
+		10px 22px 40px -20px rgba(72, 58, 34, 0.28);
+	--shadow-lift:
+		inset 0 1px 0 rgba(255, 255, 255, 0.9),
+		2px 4px 8px rgba(72, 58, 34, 0.1),
+		18px 40px 64px -22px rgba(72, 58, 34, 0.32);
+	--shadow-panel: 0 40px 90px -50px rgba(72, 58, 34, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.7);
+
+	color-scheme: light;
+}
+
+*,
+*::before,
+*::after {
+	box-sizing: border-box;
+}
+
+html {
+	-webkit-text-size-adjust: 100%;
+}
+
+body {
+	margin: 0;
+	min-height: 100svh;
+	background: var(--page-bg);
+	background-attachment: fixed;
+	color: var(--ink);
+	font-family: var(--font-sans);
+	font-size: 16px;
+	line-height: 1.7;
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+	transition: background-color 0.45s var(--ease-out), color 0.45s var(--ease-out);
+}
+
+/* 紙張顆粒 */
+body::before {
+	content: "";
+	position: fixed;
+	inset: 0;
+	z-index: 100;
+	pointer-events: none;
+	opacity: var(--grain);
+	background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+::selection {
+	background: color-mix(in srgb, var(--brass) 35%, transparent);
+	color: var(--ink);
+}
+
+a {
+	color: inherit;
+	text-decoration: none;
+}
+
+button {
+	font: inherit;
+	color: inherit;
+}
+
+h1,
+h2,
+h3,
+p {
+	margin: 0;
+}
+
+:focus-visible {
+	outline: 2px solid var(--brass);
+	outline-offset: 3px;
+	border-radius: 6px;
+}
+
+.container {
+	width: 100%;
+	max-width: var(--max);
+	margin-inline: auto;
+	padding-inline: var(--gutter);
+}
+
+.eyebrow {
+	font-family: var(--font-mono);
+	font-size: 0.72rem;
+	font-weight: 500;
+	letter-spacing: 0.18em;
+	text-transform: uppercase;
+	color: var(--ink-3);
+}
+
+/* 中文長句避免末行只剩一兩個字 */
+.lead {
+	text-wrap: pretty;
+}
+
+/* 兩三行的短段落，讓每行長度平均 */
+.lead-balance {
+	text-wrap: balance;
+}
+
+.btn {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.6rem;
+	height: 3rem;
+	padding-inline: 1.4rem;
+	border-radius: 999px;
+	border: 1px solid var(--line-strong);
+	background: transparent;
+	font-size: 0.95rem;
+	font-weight: 500;
+	letter-spacing: 0.02em;
+	cursor: pointer;
+	transition: background 0.3s, border-color 0.3s, color 0.3s;
+}
+
+.btn:hover {
+	border-color: var(--ink-2);
+}
+
+.btn svg {
+	transition: transform 0.4s var(--ease-out);
+}
+
+.btn:hover svg {
+	transform: translateX(4px);
+}
+
+.btn-primary {
+	background: var(--brass);
+	border-color: var(--brass);
+	color: var(--on-brass);
+}
+
+.btn-primary:hover {
+	background: var(--brass-light);
+	border-color: var(--brass-light);
+	color: var(--on-brass);
+}
+
+/* ── 工具頁共用：面板與表單欄位 ── */
+.panel {
+	position: relative;
+	padding: clamp(1.15rem, 2.4vw, 1.6rem);
+	border: 1px solid var(--line-strong);
+	border-radius: 22px;
+	background: var(--panel-bg);
+}
+
+.section-head {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: baseline;
+	justify-content: space-between;
+	gap: 0.35rem 1rem;
+	margin-bottom: 1.1rem;
+}
+
+.section-title {
+	font-family: var(--font-serif);
+	font-size: 1.2rem;
+	font-weight: 600;
+}
+
+.field {
+	display: flex;
+	flex-direction: column;
+	gap: 0.4rem;
+	min-width: 0;
+}
+
+.field-label {
+	font-size: 0.8rem;
+	color: var(--ink-2);
+}
+
+.field-hint,
+.field-error {
+	font-size: 0.72rem;
+	line-height: 1.5;
+	color: var(--ink-3);
+}
+
+.field-error {
+	color: var(--vermilion);
+}
+
+@media (prefers-reduced-motion: reduce) {
+	*,
+	*::before,
+	*::after {
+		transition-duration: 0.01ms !important;
+	}
+}
