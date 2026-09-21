@@ -6,6 +6,8 @@ import TextField from '../components/TextField.vue'
 import AnimatedNumber from '../components/AnimatedNumber.vue'
 import AddStockForm from '../components/portfolio/AddStockForm.vue'
 import ModalDialog from '../components/ModalDialog.vue'
+import FileDrop from '../components/FileDrop.vue'
+import ImportConfirm from '../components/ImportConfirm.vue'
 import StockCard from '../components/portfolio/StockCard.vue'
 import PortfolioCharts from '../components/portfolio/PortfolioCharts.vue'
 import { useStoredRef } from '../composables/useStoredRef.js'
@@ -271,18 +273,62 @@ function pickFile() {
 	confirmTwice('import', () => fileInput.value.click())
 }
 
+// 讀檔並檢查格式；信用卡記帳的檔案拖到這一頁時明確說明
+async function readReport(file) {
+	if (!/\.json$/i.test(file.name)) throw new Error('只能匯入 .json 檔')
+	let data
+	try {
+		data = JSON.parse(await file.text())
+	} catch {
+		throw new Error('讀不到報表資料，請確認是這個工具或舊版匯出的 JSON 檔')
+	}
+	if (Array.isArray(data?.cards)) throw new Error('這是信用卡記帳資料，請到「信用卡記帳分析」匯入')
+	try {
+		return normalize(data)
+	} catch {
+		throw new Error('讀不到報表資料，請確認是這個工具或舊版匯出的 JSON 檔')
+	}
+}
+
+function applyImport(next) {
+	report.value = next
+	view.value.collapsed = []
+	say('ok', `已匯入 ${next.stocks.length} 檔股票、${next.txs.length} 筆交易`)
+}
+
+// 按鈕匯入：覆蓋前已經按兩次確認過
 async function onFile(e) {
 	const file = e.target.files[0]
 	e.target.value = ''
 	if (!file) return
 	try {
-		const next = normalize(JSON.parse(await file.text()))
-		report.value = next
-		view.value.collapsed = []
-		say('ok', `已匯入 ${next.stocks.length} 檔股票、${next.txs.length} 筆交易`)
-	} catch {
-		say('error', '讀不到報表資料，請確認是這個工具或舊版匯出的 JSON 檔')
+		applyImport(await readReport(file))
+	} catch (err) {
+		say('error', err.message)
 	}
+}
+
+// 拖放匯入：已有股票時先開確認視窗
+const pendingImport = ref(null)
+const statsOf = (r) => [
+	{ label: '檔股票', value: r.stocks.length },
+	{ label: '筆交易', value: r.txs.length },
+]
+
+async function onDropFile(file) {
+	try {
+		const next = await readReport(file)
+		if (hasStocks.value) pendingImport.value = { next, name: file.name }
+		else applyImport(next)
+	} catch (err) {
+		say('error', err.message)
+	}
+}
+
+function confirmImport() {
+	const { next } = pendingImport.value
+	pendingImport.value = null
+	applyImport(next)
 }
 
 function clearAll() {
@@ -535,6 +581,17 @@ onBeforeUnmount(() => {
 				</TransitionGroup>
 			</section>
 		</div>
+
+		<FileDrop hint="會取代目前的投資報表，已有股票時匯入前會再確認" @file="onDropFile" @error="say('error', $event)" />
+		<ImportConfirm
+			:open="!!pendingImport"
+			:file-name="pendingImport?.name"
+			:current="statsOf(report)"
+			:next="pendingImport ? statsOf(pendingImport.next) : []"
+			@close="pendingImport = null"
+			@confirm="confirmImport"
+			@backup="exportReport"
+		/>
 	</main>
 </template>
 

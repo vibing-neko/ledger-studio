@@ -4,6 +4,8 @@ import { createScope, createTimeline, splitText, stagger, set, animate } from 'a
 import AnimatedNumber from '../components/AnimatedNumber.vue'
 import SegmentedControl from '../components/SegmentedControl.vue'
 import TabPane from '../components/TabPane.vue'
+import FileDrop from '../components/FileDrop.vue'
+import ImportConfirm from '../components/ImportConfirm.vue'
 import CardManager from '../components/expense/CardManager.vue'
 import CategoryManager from '../components/expense/CategoryManager.vue'
 import EntryForm from '../components/expense/EntryForm.vue'
@@ -350,19 +352,63 @@ function pickFile() {
 	confirmTwice('import', () => fileInput.value.click())
 }
 
+// 讀檔並檢查格式；投資報表拖到這一頁時明確說明
+async function readBook(file) {
+	if (!/\.json$/i.test(file.name)) throw new Error('只能匯入 .json 檔')
+	let data
+	try {
+		data = JSON.parse(await file.text())
+	} catch {
+		throw new Error('讀不到記帳資料，請確認是這個工具匯出的 JSON 檔')
+	}
+	if (Array.isArray(data?.stocks)) throw new Error('這是投資報表，請到「投資報酬率分析」匯入')
+	try {
+		return normalize(data)
+	} catch {
+		throw new Error('讀不到記帳資料，請確認是這個工具匯出的 JSON 檔')
+	}
+}
+
+function applyImport(next, where) {
+	book.value = next
+	view.value.card = 'all'
+	month.value = openMonth()
+	say(where, 'ok', `已匯入 ${next.cards.length} 張卡片、${next.txs.length} 筆消費`)
+}
+
+// 按鈕匯入：覆蓋前已經按兩次確認過
 async function onFile(e) {
 	const file = e.target.files[0]
 	e.target.value = ''
 	if (!file) return
 	try {
-		const next = normalize(JSON.parse(await file.text()))
-		book.value = next
-		view.value.card = 'all'
-		month.value = openMonth()
-		say('data', 'ok', `已匯入 ${next.cards.length} 張卡片、${next.txs.length} 筆消費`)
-	} catch {
-		say('data', 'error', '讀不到記帳資料，請確認是這個工具匯出的 JSON 檔')
+		applyImport(await readBook(file), 'data')
+	} catch (err) {
+		say('data', 'error', err.message)
 	}
+}
+
+// 拖放匯入：有資料時先開確認視窗；提示用固定在畫面底部的那一個，捲到哪裡都看得到
+const pendingImport = ref(null)
+const statsOf = (b) => [
+	{ label: '張卡片', value: b.cards.length },
+	{ label: '筆消費', value: b.txs.length },
+]
+
+async function onDropFile(file) {
+	try {
+		const next = await readBook(file)
+		if (hasData.value) pendingImport.value = { next, name: file.name }
+		else applyImport(next, 'entry')
+	} catch (err) {
+		say('entry', 'error', err.message)
+	}
+}
+
+function confirmImport() {
+	const { next } = pendingImport.value
+	pendingImport.value = null
+	applyImport(next, 'entry')
 }
 
 function clearAll() {
@@ -484,17 +530,6 @@ onBeforeUnmount(() => {
 										:category-choices="categoryChoices"
 										@add="addTx"
 									/>
-									<!-- 掛到 body：頁面元素進場後留著 transform，會成為 fixed 定位的參考 -->
-									<Teleport to="body">
-										<Transition :css="false" @enter="enterUp" @leave="leaveFade">
-											<p v-if="notice?.where === 'entry'" class="notice entry-notice" :class="notice.type" role="status">
-												{{ notice.text }}
-												<button v-if="notice.action" type="button" class="notice-action" @click="notice.action.run(); notice = null">
-													{{ notice.action.label }}
-												</button>
-											</p>
-										</Transition>
-									</Teleport>
 								</div>
 
 								<!-- 消費明細 -->
@@ -592,6 +627,28 @@ onBeforeUnmount(() => {
 				</div>
 			</section>
 		</div>
+		<!-- 記下、修改、拖放匯入的提示：放在分頁外，切到分析分頁也看得到；掛到 body，頁面進場後留下的 transform 才不會影響 fixed 定位 -->
+		<Teleport to="body">
+			<Transition :css="false" @enter="enterUp" @leave="leaveFade">
+				<p v-if="notice?.where === 'entry'" class="notice entry-notice" :class="notice.type" role="status">
+					{{ notice.text }}
+					<button v-if="notice.action" type="button" class="notice-action" @click="notice.action.run(); notice = null">
+						{{ notice.action.label }}
+					</button>
+				</p>
+			</Transition>
+		</Teleport>
+
+		<FileDrop hint="會取代目前的記帳資料，已有資料時匯入前會再確認" @file="onDropFile" @error="say('entry', 'error', $event)" />
+		<ImportConfirm
+			:open="!!pendingImport"
+			:file-name="pendingImport?.name"
+			:current="statsOf(book)"
+			:next="pendingImport ? statsOf(pendingImport.next) : []"
+			@close="pendingImport = null"
+			@confirm="confirmImport"
+			@backup="exportBook"
+		/>
 	</main>
 </template>
 
